@@ -47,13 +47,16 @@ remote_config_workspace()
 # files, in case the parsing of those build files depends on the bazel
 # version we require here.
 load("//tensorflow:version_check.bzl", "check_bazel_version_at_least")
+
 check_bazel_version_at_least("0.15.0")
 
 load("//tensorflow:workspace.bzl", "tf_workspace")
-
 load("//third_party/android:android_configure.bzl", "android_configure")
-android_configure(name="local_config_android")
+
+android_configure(name = "local_config_android")
+
 load("@local_config_android//:android.bzl", "android_workspace")
+
 android_workspace()
 
 # Please add all new TensorFlow dependencies in workspace.bzl.
@@ -109,3 +112,9 @@ http_archive(
     ],
 )
 
+# Adding arm64 toolchain
+new_local_repository(
+    name = "aarch64_compiler",
+    build_file = "aarch64_compiler.BUILD",
+    path = "/",
+)
