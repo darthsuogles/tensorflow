@@ -49,7 +49,7 @@ function add_custom_toolchain_to_tensorflow {
     pushd "${WORKDIR}"
     [[ -d tensorflow ]] || git clone -b "${TF_VERSION}" --single-branch https://github.com/tensorflow/tensorflow.git
     # creates a temp branch for apply some patches and reuse cloned folder
-    git checkout -B autogen-toolchain "${TF_VERSION}"
+    git checkout -B autogen-toolchain
 
     if [[ "$TF_PATCH" == "yes" ]]; then
         tf_patch || {
