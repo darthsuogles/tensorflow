@@ -1,2 +1,11 @@
+*~
+
 sources/
 userconfigs/
+toolchain/
+docker_build_context/
+
+*.tar.gz
+*.tar.xz
+*.tar.bz2
+*.whl
