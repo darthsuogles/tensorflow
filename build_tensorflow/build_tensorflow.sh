@@ -49,16 +49,16 @@ function add_custom_toolchain_to_tensorflow {
     pushd "${WORKDIR}"
     [[ -d tensorflow ]] || git clone -b "${TF_VERSION}" --single-branch https://github.com/tensorflow/tensorflow.git
     # creates a temp branch for apply some patches and reuse cloned folder
-    git checkout -B autogen-toolchain "origin/${TF_VERSION}"
+    git checkout -B autogen-toolchain "${TF_VERSION}"
 
-    if [ "$TF_PATCH" == "yes" ]; then
+    if [[ "$TF_PATCH" == "yes" ]]; then
         tf_patch || {
             log_failure_msg "error when apply patch"
             exit 1
         }
     fi
 
-    if [ ! -z "$CROSSTOOL_DIR" ] && [ ! -z "$CROSSTOOL_NAME" ]; then
+    if [[ ! -z "$CROSSTOOL_DIR" ]] && [[ ! -z "$CROSSTOOL_NAME" ]]; then
         tf_toolchain_patch "$CROSSTOOL_NAME" "$CROSSTOOL_DIR" "$CROSSTOOL_EXTRA_INCLUDE" || {
             log_failure_msg "error when apply crosstool patch"
             exit 1
