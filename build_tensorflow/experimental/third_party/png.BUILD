@@ -28,31 +28,14 @@ cc_library(
         "pngwrite.c",
         "pngwtran.c",
         "pngwutil.c",
-    ] + select({
-        ":windows": [
-            "intel/intel_init.c",
-            "intel/filter_sse2_intrinsics.c",
-        ],
-        "@tfx_experimental//tensorflow:linux_ppc64le": [
-            "powerpc/powerpc_init.c",
-            "powerpc/filter_vsx_intrinsics.c",
-        ],
-        "//conditions:default": [
-        ],
-    }),
+    ],
     hdrs = [
         "png.h",
         "pngconf.h",
     ],
-    copts = select({
-        ":windows": ["-DPNG_INTEL_SSE_OPT=1"],
-        "//conditions:default": [],
-    }),
+    copts = [],
     includes = ["."],
-    linkopts = select({
-        ":windows": [],
-        "//conditions:default": ["-lm"],
-    }),
+    linkopts = ["-lm"],
     visibility = ["//visibility:public"],
     deps = ["@zlib_archive//:zlib"],
 )

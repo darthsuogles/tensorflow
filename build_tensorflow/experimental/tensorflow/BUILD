@@ -22,6 +22,12 @@ config_setting(
     visibility = ["//visibility:public"],
 )
 
+config_setting(
+    name = "no_nccl_support",
+    define_values = {"no_nccl_support": "true"},
+    visibility = ["//visibility:public"],
+)
+
 # config_setting(
 #     name = "linux_ppc64le",
 #     values = {"cpu": "ppc"},

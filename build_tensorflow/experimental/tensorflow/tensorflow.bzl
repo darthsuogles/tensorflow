@@ -440,7 +440,7 @@ def tf_gen_op_wrapper_cc(
     tf_cc_binary(
         name = tool,
         copts = tf_copts(),
-        linkopts = if_not_windows(["-lm", "-Wl,-ldl"]),
+        linkopts = ["-lm", "-Wl,-ldl"],
         linkstatic = 1,  # Faster to link this one-time-use binary dynamically
         deps = [op_gen] + deps,
     )
@@ -1944,7 +1944,7 @@ def cc_library_with_android_deps(
         common_deps = [],
         copts = tf_copts(),
         **kwargs):
-    deps = if_not_android(deps) + if_android(android_deps) + common_deps
+    #deps = if_not_android(deps) + if_android(android_deps) + common_deps
     native.cc_library(deps = deps, copts = copts, **kwargs)
 
 register_extension_info(

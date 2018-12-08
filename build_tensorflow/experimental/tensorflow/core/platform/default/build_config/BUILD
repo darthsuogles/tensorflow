@@ -38,9 +38,6 @@ tf_cuda_library(
         "//tensorflow:using_cuda_clang_with_dynamic_build": [],
         "//tensorflow:using_cuda_nvcc_with_dynamic_build": [],
         "//conditions:default": [],
-    }) + select({
-        "@local_config_cuda//cuda:darwin": ["IOKit"],
-        "//conditions:default": [],
     }),
 )
 
@@ -50,10 +47,7 @@ cc_library(
         "//tensorflow/stream_executor",
     ] + if_static(
         ["//tensorflow/stream_executor:cuda_platform"],
-    ) + select({
-        "@local_config_cuda//cuda:darwin": ["IOKit"],
-        "//conditions:default": [],
-    }),
+    ),
 )
 
 cc_library(
@@ -79,11 +73,11 @@ cc_library(
     srcs = [],
 )
 
-# OSX framework for device driver access
-cc_library(
-    name = "IOKit",
-    linkopts = ["-framework IOKit"],
-)
+# # OSX framework for device driver access
+# cc_library(
+#     name = "IOKit",
+#     linkopts = ["-framework IOKit"],
+# )
 
 # Minimal lib so that tools used for mobile compilation
 # don't have to depend on platformlib.
@@ -227,16 +221,10 @@ cc_library(
     data = [
         "@local_config_cuda//cuda:cudart",
     ],
-    linkopts = select({
-        "@local_config_cuda//cuda:darwin": [
-            "-Wl,-rpath,../local_config_cuda/cuda/lib",
-            "-Wl,-rpath,../local_config_cuda/cuda/extras/CUPTI/lib",
-        ],
-        "//conditions:default": [
-            "-Wl,-rpath,../local_config_cuda/cuda/lib64",
-            "-Wl,-rpath,../local_config_cuda/cuda/extras/CUPTI/lib64",
-        ],
-    }),
+    linkopts = [
+        "-Wl,-rpath,../local_config_cuda/cuda/lib64",
+        "-Wl,-rpath,../local_config_cuda/cuda/extras/CUPTI/lib64",
+    ],
     deps = [
         "@local_config_cuda//cuda:cudart",
     ],

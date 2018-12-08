@@ -6212,20 +6212,20 @@ cc_library(
     ],
 )
 
-tf_kernel_library(
-    name = "summary_kernels",
-    srcs = ["summary_kernels.cc"],
-    deps = [
-        "//tensorflow/contrib/tensorboard/db:schema",
-        "//tensorflow/contrib/tensorboard/db:summary_db_writer",
-        "//tensorflow/contrib/tensorboard/db:summary_file_writer",
-        "//tensorflow/core:framework",
-        "//tensorflow/core:lib",
-        "//tensorflow/core:protos_all_cc",
-        "//tensorflow/core:summary_ops_op_lib",
-        "//tensorflow/core/lib/db:sqlite",
-    ],
-)
+# tf_kernel_library(
+#     name = "summary_kernels",
+#     srcs = ["summary_kernels.cc"],
+#     deps = [
+#         "//tensorflow/contrib/tensorboard/db:schema",
+#         "//tensorflow/contrib/tensorboard/db:summary_db_writer",
+#         "//tensorflow/contrib/tensorboard/db:summary_file_writer",
+#         "//tensorflow/core:framework",
+#         "//tensorflow/core:lib",
+#         "//tensorflow/core:protos_all_cc",
+#         "//tensorflow/core:summary_ops_op_lib",
+#         "//tensorflow/core/lib/db:sqlite",
+#     ],
+# )
 
 tf_kernel_library(
     name = "decode_proto_op",

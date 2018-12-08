@@ -14,10 +14,10 @@ FFT2D_SRCS = [
     "fft/fftsg.c",
 ]
 
-# config_setting(
-#     name = "windows",
-#     values = {"cpu": "x64_windows"},
-# )
+config_setting(
+    name = "windows",
+    values = {"cpu": "x64_windows"},
+)
 
 # This is the main 2D FFT library.  The 2D FFTs in this library call
 # 1D FFTs.  In addition, fast DCTs are provided for the special case
