@@ -8,7 +8,7 @@ default_toolchain {
 }
 default_toolchain {
   cpu: "aarch64"
-  toolchain_identifier: "$CROSSTOOL_NAME"
+  toolchain_identifier: "%{CROSSTOOL_NAME}"
 }
 
 toolchain {
@@ -27,33 +27,33 @@ toolchain {
   target_libc: "aarch64"
   target_cpu: "aarch64"
   target_system_name: "aarch64"
-  toolchain_identifier: "$CROSSTOOL_NAME"
-  tool_path { name: "ar" path: "$CROSSTOOL_DIR/bin/$CROSSTOOL_NAME-ar" }
+  toolchain_identifier: "%{CROSSTOOL_NAME}"
+  tool_path { name: "ar" path: "%{CROSSTOOL_DIR}/bin/%{CROSSTOOL_NAME}-ar" }
   tool_path { name: "compat-ld" path: "/bin/false" }
-  tool_path { name: "cpp" path: "$CROSSTOOL_DIR/bin/$CROSSTOOL_NAME-cpp" }
-  tool_path { name: "dwp" path: "$CROSSTOOL_DIR/bin/$CROSSTOOL_NAME-dwp" }
-  tool_path { name: "gcc" path: "$CROSSTOOL_DIR/bin/$CROSSTOOL_NAME-gcc" }
-  tool_path { name: "gcov" path: "$CROSSTOOL_DIR/bin/$CROSSTOOL_NAME-gcov" }
-  tool_path { name: "ld" path: "$CROSSTOOL_DIR/bin/$CROSSTOOL_NAME-ld" }
-  tool_path { name: "nm" path: "$CROSSTOOL_DIR/bin/$CROSSTOOL_NAME-nm" }
-  tool_path { name: "objcopy" path: "$CROSSTOOL_DIR/bin/$CROSSTOOL_NAME-objcopy" }
-  tool_path { name: "objdump" path: "$CROSSTOOL_DIR/bin/$CROSSTOOL_NAME-objdump" }
-  tool_path { name: "strip" path: "$CROSSTOOL_DIR/bin/$CROSSTOOL_NAME-strip" }
+  tool_path { name: "cpp" path: "%{CROSSTOOL_DIR}/bin/%{CROSSTOOL_NAME}-cpp" }
+  tool_path { name: "dwp" path: "%{CROSSTOOL_DIR}/bin/%{CROSSTOOL_NAME}-dwp" }
+  tool_path { name: "gcc" path: "%{CROSSTOOL_DIR}/bin/%{CROSSTOOL_NAME}-gcc" }
+  tool_path { name: "gcov" path: "%{CROSSTOOL_DIR}/bin/%{CROSSTOOL_NAME}-gcov" }
+  tool_path { name: "ld" path: "%{CROSSTOOL_DIR}/bin/%{CROSSTOOL_NAME}-ld" }
+  tool_path { name: "nm" path: "%{CROSSTOOL_DIR}/bin/%{CROSSTOOL_NAME}-nm" }
+  tool_path { name: "objcopy" path: "%{CROSSTOOL_DIR}/bin/%{CROSSTOOL_NAME}-objcopy" }
+  tool_path { name: "objdump" path: "%{CROSSTOOL_DIR}/bin/%{CROSSTOOL_NAME}-objdump" }
+  tool_path { name: "strip" path: "%{CROSSTOOL_DIR}/bin/%{CROSSTOOL_NAME}-strip" }
 
-  cxx_builtin_include_directory: "$CROSSTOOL_DIR/$CROSSTOOL_NAME/include/c/$CROSSTOOL_VERSION/"
-  cxx_builtin_include_directory: "$CROSSTOOL_DIR/$CROSSTOOL_NAME/sysroot/usr/include/"
-  cxx_builtin_include_directory: "$CROSSTOOL_DIR/$CROSSTOOL_NAME/libc/usr/include/"
-  cxx_builtin_include_directory: "$CROSSTOOL_DIR/lib/gcc/$CROSSTOOL_NAME/$CROSSTOOL_VERSION/include"
-  cxx_builtin_include_directory: "$CROSSTOOL_DIR/lib/gcc/$CROSSTOOL_NAME/$CROSSTOOL_VERSION/include-fixed"
+  cxx_builtin_include_directory: "%{CROSSTOOL_DIR}/%{CROSSTOOL_NAME}/include/c/%{CROSSTOOL_VERSION}/"
+  cxx_builtin_include_directory: "%{CROSSTOOL_DIR}/%{CROSSTOOL_NAME}/sysroot/usr/include/"
+  cxx_builtin_include_directory: "%{CROSSTOOL_DIR}/%{CROSSTOOL_NAME}/libc/usr/include/"
+  cxx_builtin_include_directory: "%{CROSSTOOL_DIR}/lib/gcc/%{CROSSTOOL_NAME}/%{CROSSTOOL_VERSION}/include"
+  cxx_builtin_include_directory: "%{CROSSTOOL_DIR}/lib/gcc/%{CROSSTOOL_NAME}/%{CROSSTOOL_VERSION}/include-fixed"
   cxx_builtin_include_directory: "/usr/include"
-  cxx_builtin_include_directory: "/usr/include/$CROSSTOOL_NAME"
-  cxx_builtin_include_directory: "$CROSSTOOL_EXTRA_INCLUDE"
+  cxx_builtin_include_directory: "/usr/include/%{CROSSTOOL_NAME}"
+  cxx_builtin_include_directory: "%{CROSSTOOL_EXTRA_INCLUDE}"
 
   cxx_flag: "-std=c11"
   cxx_flag: "-isystem"
   cxx_flag: "/usr/include"
   cxx_flag: "-isystem"
-  cxx_flag: "/usr/include/$CROSSTOOL_NAME"
+  cxx_flag: "/usr/include/%{CROSSTOOL_NAME}"
   linker_flag: "-lstdc"
 
   unfiltered_cxx_flag: "-Wno-builtin-macro-redefined"

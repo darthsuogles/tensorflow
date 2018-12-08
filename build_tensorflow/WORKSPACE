@@ -1,0 +1,30 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+local_repository(
+    name = "skip_oss_tensorflow",
+    path = "./tensorflow",
+)
+
+local_repository(
+    name = "local_compiler_templates",
+    path = "./templates",
+)
+
+load("@local_compiler_templates//:aarch64_configure.bzl", "aarch64_configure")
+
+aarch64_configure(name = "local_config_aarch64")
+
+local_repository(
+    name = "ignored_temporary_sources",
+    path = "./sources",
+)
+
+local_repository(
+    name = "ignored_temporary_toolchains",
+    path = "./toolchain",
+)
+
+local_repository(
+    name = "ignored_temporary_docker_build_context",
+    path = "./docker_build_context",
+)

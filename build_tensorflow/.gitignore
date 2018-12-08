@@ -9,3 +9,5 @@ docker_build_context/
 *.tar.xz
 *.tar.bz2
 *.whl
+
+bazel-*/

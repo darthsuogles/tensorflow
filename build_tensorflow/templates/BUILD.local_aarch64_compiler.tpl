@@ -3,65 +3,65 @@ package(default_visibility = ["//visibility:public"])
 filegroup(
     name = "gcc",
     srcs = [
-        "bin/$CROSSTOOL_NAME-gcc",
+        "bin/%{CROSSTOOL_NAME}-gcc",
     ],
 )
 
 filegroup(
     name = "ar",
     srcs = [
-        "bin/$CROSSTOOL_NAME-ar",
+        "bin/%{CROSSTOOL_NAME}-ar",
     ],
 )
 
 filegroup(
     name = "ld",
     srcs = [
-        "bin/$CROSSTOOL_NAME-ld",
+        "bin/%{CROSSTOOL_NAME}-ld",
     ],
 )
 
 filegroup(
     name = "nm",
     srcs = [
-        "bin/$CROSSTOOL_NAME-nm",
+        "bin/%{CROSSTOOL_NAME}-nm",
     ],
 )
 
 filegroup(
     name = "objcopy",
     srcs = [
-        "bin/$CROSSTOOL_NAME-objcopy",
+        "bin/%{CROSSTOOL_NAME}-objcopy",
     ],
 )
 
 filegroup(
     name = "objdump",
     srcs = [
-        "bin/$CROSSTOOL_NAME-objdump",
+        "bin/%{CROSSTOOL_NAME}-objdump",
     ],
 )
 
 filegroup(
     name = "strip",
     srcs = [
-        "bin/$CROSSTOOL_NAME-strip",
+        "bin/%{CROSSTOOL_NAME}-strip",
     ],
 )
 
 filegroup(
     name = "as",
     srcs = [
-        "bin/$CROSSTOOL_NAME-as",
+        "bin/%{CROSSTOOL_NAME}-as",
     ],
 )
 
 filegroup(
     name = "compiler_pieces",
     srcs = glob([
-        "$CROSSTOOL_NAME/**",
+        "%{CROSSTOOL_NAME}/**",
         "libexec/**",
-        "lib/gcc/$CROSSTOOL_NAME/**",
+        "lib/gcc/%{CROSSTOOL_NAME}/**",
         "include/**",
     ]),
 )
