@@ -2,6 +2,7 @@
 
 _bsd_="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${_bsd_}/configs/xavier.conf"
+#source "${_bsd_}/configs/xavier_no_cuda.conf"
 source "${_bsd_}/patch.sh"
 
 set -eu -o pipefail
@@ -115,22 +116,31 @@ function bazel-build-tensorflow {
     bazel build -c opt ${BAZEL_COPT_FLAGS} --verbose_failures ${BAZEL_EXTRA_FLAGS}
 }
 
-function bazel-build-tensorflow-aarch64 {
+function bazel-build-tensorflow-willow {
+    bazel build -c opt ${BAZEL_COPT_FLAGS} --verbose_failures ${BAZEL_EXTRA_FLAGS} \
+      -- \
+      //tensorflow:libtensorflow.so \
+      -//tensorflow/lite/... \
+      -//tensorflow/contrib/...
+}
+
+function bazel-build-tensorflow-aarch64-cpu-only {
     bazel build \
-         -c opt ${BAZEL_COPT_FLAGS} \
-         --config=cuda \
-         --crosstool_top=//third_party/toolchains/cpus/aarch64:toolchain \
-         --cpu=arm  --compiler=cuda \
+         -c opt \
+         --cpu=aarch64 \
+         --crosstool_top=//third_party/cross_cuda_aarch64:toolchain \
          --copt=-std=c++11 \
          --copt=-funsafe-math-optimizations --copt=-ftree-vectorize --copt=-fomit-frame-pointer \
          --config=monolithic \
          --config=noaws --config=nogcp --config=nohdfs --config=noignite --config=nokafka --config=nonccl \
-         //tensorflow:libtensorflow.so //tensorflow:libtensorflow_framework.so
+         \$@
 }
+
 _BAZEL_BUILD_EOF_
     source SOURCE_ME_TO_BUILD_TENSORFLOW
-    bazel clean
-    bazel-build-tensorflow-aarch64
+    bazel clean --expunge
+    #bazel-build-tensorflow-aarch64-cpu-only //tensorflow/tools/pip_package:build_pip_package
+    bazel-build-tensorflow-willow
     popd
     log_app_msg "Done."
 }
@@ -138,7 +148,7 @@ _BAZEL_BUILD_EOF_
 function main {
     #fetch_toolchain
     fetch_and_patch_tensorflow
-    configure_tensorflow
+    #configure_tensorflow
     build_tensorflow
 }
 

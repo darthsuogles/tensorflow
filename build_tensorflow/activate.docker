@@ -9,21 +9,20 @@ BASE_IMAGE=ubuntu:16.04
 
 docker images | grep extern-deps &>/dev/null || \
     docker build "${_bsd_}/docker_build_context" \
-       -t extern-deps \
-       -f -<<'_DEPS_EOF_'
+           -t extern-deps \
+           -f -<<'_DEPS_EOF_'
 FROM scratch
 COPY * /external/
 _DEPS_EOF_
 
 docker build "$(mktemp -d)" \
-       --build-arg CUDA_VER="9.2" \
        --build-arg BASE_IMAGE="${BASE_IMAGE}" \
        --build-arg HOST_UID="$(id -u)" \
        --build-arg DOCKER_ARCH=arm64v8 \
        --build-arg OS_TARGET_ARCH=arm64 \
        --build-arg TARGET_ARCH=aarch64 \
-       -t cross-builder \
-       -f -<<'_DOCKERFILE_EOF_'
+       -t cross-gcc-builder \
+       -f -<<'_GCC_DOCKERFILE_EOF_'
 ARG BASE_IMAGE
 ARG TARGET_ARCH
 ARG DOCKER_ARCH
@@ -119,58 +118,78 @@ RUN python3 -m pip install -U --no-cache-dir \
 RUN python3 -m pip install -U --no-cache-dir keras_applications==1.0.5 --no-deps
 RUN python3 -m pip install -U --no-cache-dir keras_preprocessing==1.0.3 --no-deps
 
+RUN rm -rf /var/lib/apt/lists/*
 
+FROM TF_CROSS_BUILD_TOOLCHAIN_LAYER AS TF_BUILD_BASE_RUNTIME
+USER ${CONTAINER_USER_NAME}
+
+_GCC_DOCKERFILE_EOF_
+
+docker build "$(mktemp -d)" \
+       --build-arg CUDA_VER="9.2" \
+       --build-arg BASE_IMAGE=cross-gcc-builder \
+       --build-arg TARGET_ARCH=aarch64 \
+       -t cross-cuda-gcc-builder \
+       -f -<<'_DOCKERFILE_EOF_'
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE} AS TF_CROSS_BUILD_CUDA_TOOLCHAIN_LAYER
+USER root
+
+# Copy CUDA and DriveWorks tools
 ARG CUDA_VER
 ENV CUDA_VER=${CUDA_VER}
 COPY --from=extern-deps /external /external
 RUN ls /external
 
-RUN mkdir -p /usr/local/cuda-${CUDA_VER}/dl
-RUN find /external \
-    -name "TensorRT-*x86_64*.cuda-${CUDA_VER}.cudnn*.tar.gz" \
-    -exec \
-    tar -zxf {} --strip-components=1 --directory /usr/local/cuda-${CUDA_VER}/dl \;
+ARG TARGET_ARCH
+ENV TARGET_ARCH=${TARGET_ARCH}
+
+RUN apt-get update \
+    && dpkg -i /external/cuda-repo-ubuntu1604-9-2-local_9.2.88-1_amd64.deb \
+    && apt-key add /var/cuda-repo-9-2-local/7fa2af80.pub
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    cuda-toolkit-9-2 \
+    cuda-cross-${TARGET_ARCH}-9-2
+
+# Install aarch64 external libraries
+WORKDIR /tmp_aarch64-linux
+
 RUN find /external \
     -name "TensorRT-*aarch64*.cuda-${CUDA_VER}.cudnn*.tar.gz" \
     -exec \
-    tar -zxf {} --strip-components=1 --directory /usr/local/cuda-${CUDA_VER}/dl \;
+    tar -zxf {} --strip-components=1 --directory /tmp_aarch64-linux \;
 
-# Install cuDNN
-WORKDIR /tmp_aarch64-linux
 RUN find /external \
     -name "cudnn-${CUDA_VER}-linux-aarch64-v*.tgz" \
     -exec \
     tar -zxf {} --directory /tmp_aarch64-linux \;
 
-RUN cp /tmp_aarch64-linux/cuda/include/* /usr/local/cuda-${CUDA_VER}/dl/targets/aarch64-linux-gnu/include/
-RUN cp -d /tmp_aarch64-linux/cuda/lib64/* /usr/local/cuda-${CUDA_VER}/dl/targets/aarch64-linux-gnu/lib/
+WORKDIR /usr/local/cuda-${CUDA_VER}/targets/aarch64-linux
+RUN rsync -avz /tmp_aarch64-linux/cuda/include/ include/
+RUN rsync -avz /tmp_aarch64-linux/cuda/lib64/ lib/
 
+# Install x86_64 external libraries
 WORKDIR /tmp_x86_64-linux
+
+RUN find /external \
+    -name "TensorRT-*x86_64*.cuda-${CUDA_VER}.cudnn*.tar.gz" \
+    -exec \
+    tar -zxf {} --strip-components=1 --directory /tmp_x86_64-linux \;
+
 RUN find /external \
     -name "cudnn-${CUDA_VER}-linux-x64-v*.tgz" \
     -exec tar -xvf {} --directory /tmp_x86_64-linux \;
-RUN cp /tmp_x86_64-linux/cuda/include/* /usr/local/cuda-${CUDA_VER}/dl/targets/x86_64-linux-gnu/include/
-RUN cp -d /tmp_x86_64-linux/cuda/lib64/* /usr/local/cuda-${CUDA_VER}/dl/targets/x86_64-linux-gnu/lib/
+
+WORKDIR /usr/local/cuda-${CUDA_VER}/targets/x86_64-linux
+RUN rsync -avz /tmp_x86_64-linux/cuda/include/ include/
+RUN rsync -avz /tmp_x86_64-linux/cuda/lib64/ lib/
 
 RUN rm -rf /tmp_aarch64-linux /tmp_x86_64-linux
-
-RUN dpkg -i /external/cuda-repo-ubuntu1604-9-2-local_9.2.88-1_amd64.deb
-RUN apt-key add /var/cuda-repo-9-2-local/7fa2af80.pub
-RUN apt-get update && apt-get install -y \
-    cuda-toolkit-9-2 \
-    cuda-cross-aarch64-9-2
-
 RUN rm -rf /external
 RUN rm -rf /var/lib/apt/lists/*
 
-WORKDIR /usr/local/cuda-9.2/dl/
-RUN rsync -avz targets/ /usr/local/cuda-${CUDA_VER}/targets/
-RUN rsync -avz include/ /usr/local/cuda-${CUDA_VER}/include/
-RUN rsync -avz lib/ /usr/local/cuda-${CUDA_VER}/lib64/
-WORKDIR /usr/local/cuda-9.2/
-RUN rm -rf dl/
-
-FROM TF_CROSS_BUILD_TOOLCHAIN_LAYER AS THIRD_PARTY_DEPS_LAYER
+FROM TF_CROSS_BUILD_CUDA_TOOLCHAIN_LAYER AS THIRD_PARTY_DEPS_LAYER
 WORKDIR /opt/third_party
 RUN chown -R ${USER} /opt/third_party
 
@@ -179,11 +198,17 @@ USER ${CONTAINER_USER_NAME}
 
 _DOCKERFILE_EOF_
 
-docker run -it \
-       --user="$(id -u)" \
-       --privileged \
-       --ipc=host \
-       -v "$(readlink -f ~/pkgs)":/host/pkgs \
-       -v ${PWD}:/workspace -w /workspace \
-       cross-builder \
-       /bin/bash
+function docker_exec {
+    local -r image_type=${1}
+    docker run --rm -it \
+           --user="$(id -u)" \
+           --privileged \
+           --ipc=host \
+           -v "$(readlink -f ~/pkgs)":/host/pkgs \
+           -v ${PWD}:/workspace -w /workspace \
+           "${image_type}" \
+           /bin/bash
+}
+
+#docker_exec cross-gcc-builder
+docker_exec cross-cuda-gcc-builder
