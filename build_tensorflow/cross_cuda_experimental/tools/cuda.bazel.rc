@@ -1,0 +1,32 @@
+build --action_env PYTHON_BIN_PATH="/usr/bin/python3.5"
+build --action_env PYTHON_LIB_PATH="/usr/local/lib/python3.5/dist-packages"
+build --python_path="/usr/bin/python3.5"
+build:xla --define with_xla_support=true
+
+build --action_env TF_NEED_OPENCL_SYCL="0"
+build --action_env TF_NEED_ROCM="0"
+build --action_env TF_NEED_CUDA="1"
+build --action_env CUDA_TOOLKIT_PATH="/usr/local/cuda-9.2"
+build --action_env TF_CUDA_VERSION="9.2"
+build --action_env CUDNN_INSTALL_PATH="/usr/local/cuda-9.2"
+build --action_env TF_CUDNN_VERSION="7"
+build --action_env TF_NCCL_VERSION=""
+build --action_env TF_CUDA_COMPUTE_CAPABILITIES="7.0,7.2"
+build --action_env TF_CUDA_CLANG="0"
+
+build --action_env TF_CROSS_COMPILATION="1"
+build --action_env CROSS_NVCC_HOST_COMPILER_PATH="/usr/bin/gcc"
+build --action_env CROSS_NVCC_TARGET_COMPILER_PATH="/host/pkgs/linaro-xenial/bin/aarch64-linux-gnu-gcc"
+
+# # This compiler is used for the NVCC wrapper, must be the target compiler
+# # We actually need two versions of this, one for the host and the other the target
+# # Otherwise host items will be compiled to the target
+# build --action_env GCC_HOST_COMPILER_PATH="/host/pkgs/linaro-xenial/bin/aarch64-linux-gnu-gcc"
+
+build --config=cuda
+test --config=cuda
+# build:opt --copt=-march=native
+build:opt --copt=-Wno-sign-compare
+build:opt --host_copt=-march=native
+build:opt --define with_default_optimizations=true
+build:v2 --define=tf_api_version=2

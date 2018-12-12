@@ -1,0 +1,6 @@
+load("//third_party/gpus:configure.bzl", "cuda_configure")
+load("//third_party/platform:configure.bzl", "platform_configure")
+
+cuda_configure(name = "local_config_cuda")
+
+platform_configure(name = "local_config_platform")

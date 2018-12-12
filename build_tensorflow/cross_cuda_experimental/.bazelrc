@@ -1,0 +1,2 @@
+import %workspace%/tools/bazel.rc
+import %workspace%/tools/cuda.bazel.rc
