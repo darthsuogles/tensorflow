@@ -28,32 +28,38 @@ config_setting(
     visibility = ["//visibility:public"],
 )
 
+alias(
+    name = "cuda_headers",
+    actual = "@local_config_cuda//cuda:cuda_headers",
+)
+
 cc_library(
     name = "salut_lib",
     srcs = ["salut_lib.cc"],
     deps = [
-        "@local_config_cuda//cuda:cuda_headers",
-    ],
-)
-
-cc_binary(
-    name = "salut",
-    srcs = ["salut.cc"],
-    data = [
-        "@local_config_platform//empty:secret",
-    ],
-    deps = [
-        "@local_config_cuda//cuda:cuda_headers",
+        ":cuda_headers",
     ],
 )
 
 cc_binary(
     name = "salut_platform_depedent",
     srcs = ["salut.cc"],
-    deps = select({
+    deps = [
+        ":cuda_headers",
+        "@local_config_cuda//cuda",
+    ] + select({
         "aarch64": ["//src/platform:aarch64"],
         "//conditions:default": ["//src/platform:x86_64"],
     }),
+)
+
+cc_binary(
+    name = "hw_cublas",
+    srcs = ["hw_cublas.cc"],
+    deps = [
+        ":cuda_headers",
+        "@local_config_cuda//cuda",
+    ],
 )
 
 genrule(

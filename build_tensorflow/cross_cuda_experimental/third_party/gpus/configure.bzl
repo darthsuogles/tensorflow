@@ -985,7 +985,7 @@ def symlink_genrule_for_dir(repository_ctx,
     # We clear folders that might have been generated previously to avoid
     # undesired inclusions
     for _dir in ["extras", "include", "lib", "nvvm"]:
-        _dir_text = '$(@D)/%s/%s' % (target_arch, _dir)
+        _dir_text = '$(@D)/{}'.format(_dir)
         _cmd_text = 'if [ -d "%s" ]; then rm "%s" -drf; fi' % (_dir_text,
                                                                _dir_text)
         command.append(_cmd_text)
@@ -998,7 +998,6 @@ def symlink_genrule_for_dir(repository_ctx,
         # $(@D) will include the full path to the file.
         stripped_dest = (
             dest_dir + dest_fname) if len(dest_files) != 1 else dest_fname
-        stripped_dest = target_arch + '/' + stripped_dest
         full_dest = '$(@D)/' + stripped_dest
 
         # Copy the headers to create a sandboxable setup.
@@ -1202,7 +1201,7 @@ def _create_local_cuda_repository(repository_ctx, target_arch):
             ),
         })
     _tpl(
-        repository_ctx, None, "cuda:BUILD", {
+        repository_ctx, None, "cuda:BUILD.arch", {
             "%{cuda_driver_lib}":
             cuda_libs["cuda"].file_name,
             "%{cudart_static_lib}":
@@ -1228,7 +1227,9 @@ def _create_local_cuda_repository(repository_ctx, target_arch):
             "%{cuda_headers}":
             (('":cuda-include-%s",\n' % target_arch) +
              ('        ":cudnn-include-%s",' % target_arch)),
-        })
+        },
+        "{}/cuda/BUILD".format(target_arch)
+    )
 
     # Set up crosstool/
     cc = find_cc(repository_ctx)
@@ -1296,7 +1297,7 @@ def _create_local_cuda_repository(repository_ctx, target_arch):
     # Set up cuda_config.h, which is used by
     # tensorflow/stream_executor/dso_loader.cc.
     _tpl(
-        repository_ctx, target_arch, "cuda:cuda_config.h", {
+        repository_ctx, None, "cuda:cuda_config.h", {
             "%{cuda_version}":
             cuda_config.cuda_version,
             "%{cudnn_version}":
@@ -1308,7 +1309,9 @@ def _create_local_cuda_repository(repository_ctx, target_arch):
             ], ),
             "%{cuda_toolkit_path}":
             cuda_config.cuda_toolkit_path,
-        })
+        },
+        "{}/cuda/cuda/cuda_config.h".format(target_arch)
+    )
 
 
 def _cuda_autoconf_impl(repository_ctx):
@@ -1316,6 +1319,8 @@ def _cuda_autoconf_impl(repository_ctx):
     genrules = []
     for target_arch in _VALID_CUDA_TARGET_ARCH:
         _create_local_cuda_repository(repository_ctx, target_arch)
+        repository_ctx.file("{}/BUILD".format(target_arch), "")
+    _tpl(repository_ctx, None, "cuda:BUILD", {})
 
 cuda_configure = repository_rule(
     implementation=_cuda_autoconf_impl,

@@ -1,4 +1,4 @@
-//#include "aarch64/cuda/include/cuda.h"
+#include "cuda/include/cuda.h"
 #include <iostream>
 
 namespace salut {

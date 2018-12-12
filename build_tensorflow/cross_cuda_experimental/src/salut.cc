@@ -1,6 +1,7 @@
 #include <iostream>
-//#include "cuda/include/cublas.h"
-//#include "aarch64/cuda/include/cuda.h"
+#include "cuda/cuda_config.h"
+#include "cuda/include/cuda.h"
+#include "cuda/include/cublas.h"
 #include "platform/platform.hpp"
 
 int main() {
