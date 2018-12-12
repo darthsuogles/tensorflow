@@ -9,6 +9,11 @@ local_repository(
 )
 
 local_repository(
+    name = "skip_cross_cuda_experimental",
+    path = "./cross_cuda_experimental",
+)
+
+local_repository(
     name = "ignored_temporary_sources",
     path = "./sources",
 )

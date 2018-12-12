@@ -1,1 +1,24 @@
 #+TITLE: TensorFlow Study Guide
+
+* CUDA
+  =/third_party/gpus/cuda_configure.bzl= does all the heavy lifting.
+  The =repository_rule= depends on =nvcc= to obtain compiler and architecture information.
+
+  #+BEGIN_SRC sh
+    /usr/local/cuda/bin/nvcc -v /dev/null -o /dev/null
+    #$ _SPACE_=
+    #$ _CUDART_=cudart
+    #$ _HERE_=/usr/local/cuda/bin
+    #$ _THERE_=/usr/local/cuda/bin
+    #$ _TARGET_SIZE_=
+    #$ _TARGET_DIR_=
+    #$ _TARGET_DIR_=targets/x86_64-linux
+    #$ TOP=/usr/local/cuda/bin/..
+    #$ NVVMIR_LIBRARY_DIR=/usr/local/cuda/bin/../nvvm/libdevice
+    #$ LD_LIBRARY_PATH=/usr/local/cuda/bin/../lib:
+    #$ PATH=/usr/local/cuda/bin/../nvvm/bin:/usr/local/cuda/bin
+    #$ INCLUDES="-I/usr/local/cuda/bin/../targets/x86_64-linux/include"
+    #$ LIBRARIES=  "-L/usr/local/cuda/bin/../targets/x86_64-linux/lib/stubs" "-L/usr/local/cuda/bin/../targets/x86_64-linux/lib"
+    #$ CUDAFE_FLAGS=
+    #$ PTXAS_FLAGS=
+  #+END_SRC
