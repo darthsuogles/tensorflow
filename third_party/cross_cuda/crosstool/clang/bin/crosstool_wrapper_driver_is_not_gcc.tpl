@@ -224,8 +224,7 @@ def InvokeNvcc(argv, log=False):
            ' --compiler-bindir=' + GCC_HOST_COMPILER_PATH +
            ' -I .' +
            ' -x cu ' + opt + includes + ' ' + srcs + ' -M -o ' + depfile)
-    if log: Log(cmd)
-    Log("\n##+BEGIN_DEPS_COMMAND+##\n", cmd, "\n##+END_DEPS_COMMAND+##\n")
+    if log: Log("\n##+BEGIN_DEPS_COMMAND+##\n", cmd, "\n##+END_DEPS_COMMAND+##\n")
     exit_status = os.system(cmd)
     if exit_status != 0:
       return exit_status
@@ -241,8 +240,7 @@ def InvokeNvcc(argv, log=False):
   # TODO(phi9t): cross compilation does not seem to find the correct toolchain
   # items such as 'ld'
   cmd = 'PATH=' + PREFIX_DIR + ':$PATH ' + cmd
-  if log: Log(cmd)
-  Log("\n##+BEGIN_COMMAND+##\n", cmd, "\n##+END_COMMAND+##\n")
+  if log: Log("\n##+BEGIN_COMMAND+##\n", cmd, "\n##+END_COMMAND+##\n")
   return os.system(cmd)
 
 

@@ -970,7 +970,7 @@ def symlink_genrule_for_dir(repository_ctx,
     If src_dir is passed, files will be read from the given directory; otherwise
     we assume files are in src_files and dest_files
     """
-    genrule_name = "%s-%s" % (genrule_name, target_arch)
+    #genrule_name = "%s-%s" % (genrule_name, target_arch)
     if src_dir != None:
         src_dir = _norm_path(src_dir)
         dest_dir = _norm_path(dest_dir)
@@ -1186,7 +1186,7 @@ def _create_local_cuda_repository(repository_ctx, target_arch):
     else:
         genrules.append(
             "filegroup(\n" +
-            ('    name = "cudnn-include-{}",\n'.format(target_arch)) +
+            '    name = "cudnn-include",\n' +
             "    srcs = [],\n" + ")\n", )
 
     # Set up BUILD file for cuda/
@@ -1225,8 +1225,8 @@ def _create_local_cuda_repository(repository_ctx, target_arch):
             "%{cuda_include_genrules}":
             "\n".join(genrules),
             "%{cuda_headers}":
-            (('":cuda-include-%s",\n' % target_arch) +
-             ('        ":cudnn-include-%s",' % target_arch)),
+            ('":cuda-include",\n' +
+             '        ":cudnn-include",'),
         },
         "{}/cuda/BUILD".format(target_arch)
     )
